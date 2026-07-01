@@ -744,6 +744,9 @@
     <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="qrTitle">
       <div class="modal-head">
         <h3 id="qrTitle" class="modal-title"></h3>
+        <button id="copyQrBtn" class="icon-btn" type="button" aria-label="Copy Subscription">
+          <i class="fa-regular fa-copy"></i>
+        </button>
         <button id="closeQrBtn" class="icon-btn" type="button" aria-label="Close">
           <i class="fa-regular fa-xmark"></i>
         </button>
@@ -1155,8 +1158,11 @@
       document.getElementById("copyBtn").setAttribute("aria-label", t.copyLink);
       document.getElementById("qrBtn").setAttribute("title", t.showQr);
       document.getElementById("qrBtn").setAttribute("aria-label", t.showQr);
+      document.getElementById("copyQrBtn").setAttribute("title", t.copyLink);
+      document.getElementById("copyQrBtn").setAttribute("aria-label", t.copyLink);
       document.getElementById("copyBtn").disabled = !usageModel.subscriptionLink;
       document.getElementById("qrBtn").disabled = !usageModel.subscriptionLink;
+      document.getElementById("copyQrBtn").disabled = !usageModel.subscriptionLink;
 
       document.getElementById("qrTitle").textContent = t.qrTitle;
       document.getElementById("qrLinkText").textContent = t.linkLabel + ": " + usageModel.subscriptionLink;
@@ -1379,6 +1385,25 @@
       }
     }
 
+    async function copyUriLink() {
+      const t = i18n[state.lang];
+      if (!usageModel.resultUri) {
+        showToast(t.copyFail);
+        return;
+      }
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(usageModel.resultUri);
+        } else {
+          const ok = copyTextFallback(usageModel.resultUri);
+          if (!ok) throw new Error("fallback copy failed");
+        }
+        showToast(t.copyDone);
+      } catch (err) {
+        showToast(t.copyFail);
+      }
+    }
+
     function renderAll() {
       applyTheme();
       applyLanguage();
@@ -1398,6 +1423,7 @@
     });
 
     document.getElementById("copyBtn").addEventListener("click", copySubscriptionLink);
+    document.getElementById("copyQrBtn").addEventListener("click", copyUriLink);
     document.getElementById("qrBtn").addEventListener("click", openQrModal);
     document.getElementById("closeQrBtn").addEventListener("click", closeQrModal);
     document.getElementById("qrModal").addEventListener("click", function (event) {
