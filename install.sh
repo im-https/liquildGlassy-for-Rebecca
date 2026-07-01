@@ -38,7 +38,7 @@ check_and_install_jq
 clear
 
 # Define the API URL and target directory
-API_URL="https://api.github.com/repos/aghayecoder/tx-themehub/contents/themes"
+API_URL="https://api.github.com/repos/incognito-coder/tx-themehub/contents/themes"
 TARGET_DIR="/etc/x-ui/html"
 
 # Fetch the list of theme names
@@ -57,7 +57,7 @@ select theme in "${themes[@]}"; do
         echo "You selected: $theme"
 
         # Download the selected theme file
-        FILE_URL="https://raw.githubusercontent.com/aghayecoder/tx-themehub/main/themes/$theme"
+        FILE_URL="https://raw.githubusercontent.com/incognito-coder/tx-themehub/main/themes/$theme"
         TEMP_FILE="/tmp/$theme"
 
         echo "Downloading $theme..."
