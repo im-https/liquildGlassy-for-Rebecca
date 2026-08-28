@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr" data-theme="light" data-palette="pink">
+<html lang="fa" dir="rtl" data-theme="light" data-palette="pink">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -2754,7 +2754,7 @@ var qrcode = function() {
         if (!url) return '';
         if (app === 'v2rayng') return 'v2rayng://install-sub?url=' + encodeURIComponent(url) + '#' + encodeURIComponent(name);
         if (app === 'v2box') return 'v2box://install-sub?url=' + encodeURIComponent(url) + '&name=' + encodeURIComponent(name);
-        if (app === 'streisand') return 'streisand://import/' + encodeURIComponent(url);
+        if (app === 'streisand') return 'streisand://import/' + url;
         return ''; // v2rayN uses its supported clipboard/subscription-group workflow.
       }
       function configs(values) { return [...new Set(values.map(value => value.trim()).filter(value => /^(vless|vmess|trojan|ss|ssr|hysteria2?|hy2|tuic|wireguard|socks5?):\/\//i.test(value)))]; }
