@@ -43,6 +43,12 @@ bash <(curl -Ls https://raw.githubusercontent.com/AghayeCoder/tx-themehub/master
 
 If everything is done correctly, your custom template should now be displayed instead of the default subscription page.
 
+<details>
+<summary>liquildGlassy · Green / English / light</summary>
+
+![liquildGlassy green theme](./screenshots/liquildGlassy-green.png)
+</details>
+
 ## ScreenShots
 <details>
 <summary>AIO UI</summary>
@@ -73,4 +79,14 @@ If everything is done correctly, your custom template should now be displayed in
 <summary>BestBlack</summary>
 
 ![Screenshot](./screenshots/bestblack.png "bblack")
+</details>
+<details>
+<summary>liquildGlassy · Pink / English / light</summary>
+
+![liquildGlassy English light theme](./screenshots/liquildGlassy.png)
+</details>
+<details>
+<summary>liquildGlassy · Green / فارسی / dark / mobile</summary>
+
+![liquildGlassy Persian dark mobile theme](./screenshots/liquildGlassy-fa-dark.png)
 </details>
