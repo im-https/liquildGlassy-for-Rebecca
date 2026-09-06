@@ -1,91 +1,69 @@
 #!/bin/bash
 
-check_and_install_jq() {
-    if command -v jq &>/dev/null; then
-        echo "jq is already installed."
-        return 0
-    fi
+# مسیر هدف برای کپی فایل قالب
+TARGET_DIR="/var/lib/rebecca/templates/subscription"
+# مسیر موقت برای کلون کردن مخزن
+TEMP_REPO_DIR="/tmp/liquildGlassy-for-Rebecca"
 
-    echo "jq is not installed. Attempting to install..."
+# رنگ‌ها برای خروجی زیباتر
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+NC='\033[0m' # No Color
 
-    # Detect package manager and install jq
-    if command -v apt &>/dev/null; then
-        sudo apt update && sudo apt install -y jq
-    elif command -v dnf &>/dev/null; then
-        sudo dnf install -y jq
-    elif command -v yum &>/dev/null; then
-        sudo yum install -y jq
-    elif command -v pacman &>/dev/null; then
-        sudo pacman -Sy --noconfirm jq
-    elif command -v zypper &>/dev/null; then
-        sudo zypper install -y jq
-    elif command -v brew &>/dev/null; then
-        brew install jq
-    else
-        echo "Unsupported package manager. Please install jq manually."
-        return 1
-    fi
+echo -e "${GREEN}شروع نصب قالب LiquildGlassy برای Rebecca Panel...${NC}"
 
-    # Verify installation
-    if command -v jq &>/dev/null; then
-        echo "jq successfully installed."
-    else
-        echo "jq installation failed."
-        return 1
-    fi
-}
-check_and_install_jq
-clear
+# 1. بررسی اجرا با دسترسی روت (برای نوشتن در /var/lib)
+if [[ $EUID -ne 0 ]]; then
+   echo -e "${RED}این اسکریپت باید با دسترسی روت (sudo) اجرا شود.${NC}"
+   exit 1
+fi
 
-# Define the API URL and target directory
-API_URL="https://api.github.com/repos/incognito-coder/tx-themehub/contents/themes"
-TARGET_DIR="/etc/x-ui/html"
+# 2. ایجاد پوشه هدف در صورت وجود نداشتن
+mkdir -p "$TARGET_DIR"
 
-# Fetch the list of theme names
-themes=($(curl -s "$API_URL" | jq -r '.[].name'))
+# 3. حذف پوشه موقت قدیمی (در صورت وجود)
+rm -rf "$TEMP_REPO_DIR"
 
-# Check if themes were retrieved successfully
-if [ ${#themes[@]} -eq 0 ]; then
-    echo "No themes found or failed to fetch data."
+# 4. کلون کردن مخزن
+echo -e "${GREEN}در حال دریافت آخرین نسخه قالب از مخزن...${NC}"
+git clone https://github.com/im-https/liquildGlassy-for-Rebecca.git "$TEMP_REPO_DIR"
+
+# 5. بررسی موفقیت کلون
+if [ $? -ne 0 ]; then
+    echo -e "${RED}خطا در کلون کردن مخزن. لطفاً اتصال اینترنت خود را بررسی کنید.${NC}"
     exit 1
 fi
 
-# Display the themes as a selectable menu
-echo "Select a theme:"
-select theme in "${themes[@]}"; do
-    if [ -n "$theme" ]; then
-        echo "You selected: $theme"
+# 6. پیدا کردن و کپی کردن فایل index.html
+#    بر اساس ساختار، فایل‌های قالب در پوشه themes قرار دارند.
+#    ما یک فایل index.html را از اولین پوشه موجود در themes برمی‌داریم.
+#    برای سادگی، می‌توانید دقیقاً مشخص کنید از کدام قالب استفاده شود.
+#    مثال: از قالب 'liquildGlassy' استفاده می‌کنیم.
+THEME_SOURCE="$TEMP_REPO_DIR/themes/liquildGlassy/index.html"
 
-        # Download the selected theme file
-        FILE_URL="https://raw.githubusercontent.com/incognito-coder/tx-themehub/main/themes/$theme"
-        TEMP_FILE="/tmp/$theme"
+if [ -f "$THEME_SOURCE" ]; then
+    echo -e "${GREEN}یافتن فایل قالب در: $THEME_SOURCE${NC}"
+    cp "$THEME_SOURCE" "$TARGET_DIR/"
+    echo -e "${GREEN}فایل index.html با موفقیت در $TARGET_DIR کپی شد.${NC}"
+else
+    echo -e "${RED}خطا: فایل index.html در مسیر $THEME_SOURCE یافت نشد.${NC}"
+    echo -e "${RED}لطفاً ساختار پوشه‌های پروژه را بررسی کنید.${NC}"
+    # پاکسازی و خروج
+    rm -rf "$TEMP_REPO_DIR"
+    exit 1
+fi
 
-        echo "Downloading $theme..."
-        curl -s -o "$TEMP_FILE" "$FILE_URL"
+# 7. پاکسازی: حذف پوشه موقت
+rm -rf "$TEMP_REPO_DIR"
+echo -e "${GREEN}پاکسازی انجام شد.${NC}"
 
-        # Check if the file was downloaded successfully
-        if [ ! -s "$TEMP_FILE" ]; then
-            echo "Failed to download $theme. Please check the file URL."
-            exit 1
-        fi
+# 8. راهنمای نهایی
+echo -e "${GREEN}✅ نصب با موفقیت انجام شد!${NC}"
+echo "مراحل بعدی:"
+echo "1. در پنل Rebecca، به بخش Settings -> Subscriptions بروید."
+echo "2. در قسمت 'Custom templates directory'، مسیر زیر را وارد کنید:"
+echo "   /var/lib/rebecca/templates"
+echo "3. تنظیمات را ذخیره کرده و سرویس پنل را مجدداً راه‌اندازی کنید."
+echo "قالب شما در آدرس اشتراک‌گیری قابل مشاهده خواهد بود."
 
-        # Create the directory if it doesn't exist
-        if [ ! -d "$TARGET_DIR" ]; then
-            mkdir -p "$TARGET_DIR"
-        fi
-        
-        # Rename and move the file
-        sudo mv "$TEMP_FILE" "$TARGET_DIR/sub.html"
-
-        # Set appropriate permissions
-        sudo chmod 644 "$TARGET_DIR/sub.html"
-        echo "Theme successfully renamed to 'sub.html' and moved to $TARGET_DIR."
-
-        # Applying Changes
-        echo "Restarting TX-UI ..."
-        sudo x-ui restart
-        break
-    else
-        echo "Invalid selection. Please try again."
-    fi
-done
+exit 0
