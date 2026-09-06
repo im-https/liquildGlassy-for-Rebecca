@@ -61,6 +61,7 @@ Your custom subscription page should now be displayed instead of the default pag
 
 ![liquildGlassy Persian dark mobile theme](./screenshots/liquildGlassy-fa-dark.png)
 
-## Credits
+##Credits
 
-Designed by **[Incognito-Coder](https://github.com/Incognito-Coder)**.
+Designed by Incognito-Coder.
+Forked by im_https.
