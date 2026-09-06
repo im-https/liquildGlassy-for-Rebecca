@@ -6,8 +6,8 @@
   <meta name="referrer" content="no-referrer">
   <meta name="color-scheme" content="light dark">
   <meta name="robots" content="noindex, nofollow, noarchive">
-  <meta name="description" content="Your subscription, in clear view. liquildGlassy for TX-UI.">
-  <title>liquildGlassy · {{ .sId }}</title>
+  <meta name="description" content="Your subscription, in clear view. liquildGlassy for Rebecca Panel.">
+  <title>liquildGlassy · {{ user.username }}</title>
   <script id="preferences">
     (() => {
       let palette = 'pink';
@@ -168,6 +168,35 @@
     .status::before { content: ''; width: 5px; height: 5px; background: currentColor; border-radius: 50%; }
     .status[data-kind="expired"], .status[data-kind="exhausted"] { color: var(--danger); background: var(--danger-bg); }
     .status[data-kind="unknown"], .status[data-kind="pending"] { color: var(--warning); background: var(--warning-bg); }
+    .status[data-kind="on_hold"] { color: var(--warning); background: var(--warning-bg); }
+    .status[data-kind="disabled"] { color: var(--danger); background: var(--danger-bg); }
+    .status[data-kind="limited"] { color: var(--warning); background: var(--warning-bg); }
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--muted) 45%, transparent); border-radius: 8px; border: 2px solid transparent; background-clip: padding-box; }
+    ::-webkit-scrollbar-thumb:hover { background: color-mix(in srgb, var(--muted) 75%, transparent); border: 2px solid transparent; background-clip: padding-box; }
+    ::-webkit-scrollbar-corner { background: transparent; }
+    html { scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--muted) 55%, transparent) transparent; }
+    * { scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--muted) 55%, transparent) transparent; }
+    .protocol-badge { display: inline-block; font-size: .6rem; font-weight: 700; letter-spacing: .07em; padding: 2px 8px; border-radius: 12px; background: var(--inset); border: 1px solid var(--line); color: var(--accent); }
+    .grid-span { grid-column: 1 / -1; }
+    .vpn-groups { display: grid; gap: 22px; margin-top: 20px; }
+    .vpn-group-title { font-size: .92rem; font-weight: 650; letter-spacing: -.02em; display: flex; align-items: center; gap: 8px; }
+    .vpn-group-title::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
+    .vpn-list { list-style: none; padding: 0; margin: 12px 0 0; display: grid; gap: 10px; }
+    .vpn-item { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 12px 13px; border: 1px solid var(--line); background: var(--inset); border-radius: 13px; }
+    .vpn-item.credential { display: block; }
+    .vpn-item-info { min-width: 0; flex: 1; }
+    .vpn-item-name { display: block; font-size: .82rem; font-weight: 600; overflow-wrap: anywhere; }
+    .vpn-item-meta { display: block; color: var(--muted); font-size: .66rem; margin-top: 1px; overflow-wrap: anywhere; }
+    .vpn-item-actions { display: flex; gap: 7px; flex-wrap: wrap; }
+    .vpn-config { margin-top: 10px; min-height: 90px; max-height: 200px; font-size: .66rem; }
+    .credential-grid { display: grid; gap: 6px; margin-top: 10px; }
+    .credential-row { display: flex; align-items: center; gap: 9px; background: var(--solid); border: 1px solid var(--line); border-radius: 9px; padding: 7px 10px; }
+    .credential-label { font-size: .64rem; color: var(--muted); min-width: 64px; }
+    .credential-row .mono { flex: 1; font-size: .72rem; overflow-wrap: anywhere; }
+    .icon-button.small-copy { width: 30px; height: 30px; border-radius: 8px; font-size: .68rem; flex-shrink: 0; }
+    @media (max-width: 800px) { .vpn-item { flex-direction: column; align-items: stretch; } .vpn-item-actions { justify-content: flex-start; } }
     .account-name { font-size: 1.45rem; font-weight: 550; letter-spacing: -.04em; margin-top: 18px; overflow-wrap: anywhere; }
     .account-id { margin-top: 2px; overflow-wrap: anywhere; }
     .plan-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-block: 21px 18px; }
@@ -262,10 +291,21 @@
 <body>
   <a class="skip" href="#main" data-i18n="skip">Skip to content</a>
   <div class="ambient" aria-hidden="true"><span></span></div>
-  <!-- Keep all untrusted Go template values in escaped HTML text/attributes, never executable JavaScript. -->
-  <div id="subscription-data" hidden data-id="{{ .sId }}" data-url="{{ .subUrl }}" data-json="{{ .jsonUrl }}" data-total="{{ .totalByte }}" data-upload="{{ .uploadByte }}" data-download="{{ .downloadByte }}" data-expire="{{ .expire }}">
-    <ul id="source-emails">{{ range .emails }}<li>{{ . }}</li>{{ end }}</ul>
-    <ul id="source-configs">{{ range .result }}<li>{{ . }}</li>{{ end }}</ul>
+  <div id="subscription-data" hidden
+    data-id="{{ user.username }}"
+    data-status="{{ user.status }}"
+    data-total="{% if user.data_limit %}{{ user.data_limit }}{% else %}0{% endif %}"
+    data-download="{{ user.used_traffic }}"
+    data-upload="0"
+    data-expire="{% if user.expire %}{{ user.expire }}{% else %}0{% endif %}"
+    data-expire-ts="{% if user.expire %}{{ user.expire }}{% else %}0{% endif %}"
+    data-created-at="{{ user.created_at }}"
+    data-online-at="{% if user.online_at %}{{ user.online_at }}{% endif %}"
+    data-reset-strategy="{{ user.data_limit_reset_strategy }}"
+    data-url="{{ user.subscription_url }}"
+    data-usage-url="{{ usage_url }}">
+    <ul id="source-emails" hidden><li>{{ user.username }}</li></ul>
+    <script id="source-configs">var subscriptionLinks = {{ links_text|safe }};</script>
   </div>
   <div class="shell">
     <header class="topbar">
@@ -353,6 +393,111 @@
           </details>
           <div class="link-tools"><label for="subscription-link" data-i18n="subscriptionLink">Subscription link</label><div class="link-line"><input id="subscription-link" dir="ltr" class="mono" readonly spellcheck="false" autocomplete="off"><button type="button" class="button small" id="copy-link"><i class="fa-solid fa-copy" aria-hidden="true"></i><span data-i18n="copy">Copy</span></button></div><button type="button" class="button small" id="copy-json" hidden><i class="fa-solid fa-link" aria-hidden="true"></i><span data-i18n="copyJson">Copy JSON subscription</span></button></div>
         </section>
+        <section class="glass card section grid-span" id="vpn-protocols" aria-labelledby="vpn-title" hidden>
+          <div class="card-heading"><div class="apps-heading"><span class="section-number" aria-hidden="true">02</span><div><h2 id="vpn-title" data-i18n="vpnTitle">VPN protocols</h2><p class="caption" data-i18n="vpnSubtitle">Downloads and connection details for classic VPN protocols.</p></div></div></div>
+          <div class="vpn-groups">
+                        {% if openvpn and openvpn.downloads %}
+            <div class="vpn-group">
+              <h3 class="vpn-group-title" data-i18n="openvpnTitle">OpenVPN downloads</h3>
+              <ul class="vpn-list">
+                {% for item in openvpn.profiles %}
+                <li class="vpn-item">
+                  <div class="vpn-item-info"><strong class="vpn-item-name">{% if item.Remark %}{{ item.Remark }}{% else %}{{ item.Filename }}{% endif %}</strong><small class="vpn-item-meta">{{ item.Filename }}</small></div>
+                  <a class="button small" href="{{ item.DownloadURL }}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-download" aria-hidden="true"></i><span data-i18n="download">Download</span></a>
+                </li>
+                {% endfor %}
+              </ul>
+            </div>
+            {% endif %}
+                        {% if wireguard and wireguard.profiles %}
+            <div class="vpn-group">
+              <h3 class="vpn-group-title" data-i18n="wireguardTitle">WireGuard</h3>
+              <ul class="vpn-list">
+                {% for item in wireguard.profiles %}
+                <li class="vpn-item">
+                  <div class="vpn-item-info"><strong class="vpn-item-name">{% if item.Remark %}{{ item.Remark }}{% else %}{{ item.Filename }}{% endif %}</strong><small class="vpn-item-meta">{{ item.Filename }}</small></div>
+                  <div class="vpn-item-actions">
+                    <a class="button small" href="{{ item.DownloadURL }}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-download" aria-hidden="true"></i><span data-i18n="download">Download</span></a>
+                    {% if item.Link %}<button type="button" class="button small" data-copy-text="{{ item.Link }}"><i class="fa-solid fa-link" aria-hidden="true"></i><span data-i18n="copyLink">Copy link</span></button>{% endif %}
+                    {% if item.Body %}<button type="button" class="button small" data-copy-text="{{ item.Body }}"><i class="fa-solid fa-copy" aria-hidden="true"></i><span data-i18n="copyConfig">Copy config</span></button>{% endif %}
+                  </div>
+                  {% if item.Body %}<textarea class="vpn-config mono" data-wg-body readonly spellcheck="false">{{ item.Body }}</textarea>{% endif %}
+                </li>
+                {% endfor %}
+              </ul>
+            </div>
+            {% endif %}
+                        {% if l2tp %}
+            <div class="vpn-group">
+              <h3 class="vpn-group-title" data-i18n="l2tpTitle">L2TP / IPSec</h3>
+              <ul class="vpn-list">
+                {% for item in l2tp %}
+                <li class="vpn-item credential">
+                  <div class="vpn-item-info"><strong class="vpn-item-name">{% if item.HostName %}{{ item.HostName }}{% else %}{{ item.Server }}{% endif %}</strong></div>
+                  <div class="credential-grid">
+                    <div class="credential-row"><span class="credential-label" data-i18n="server">Server</span><bdi class="mono" dir="ltr">{{ item.Server }}</bdi><button type="button" class="icon-button small-copy" data-copy-text="{{ item.Server }}"><i class="fa-solid fa-copy" aria-hidden="true"></i></button></div>
+                    {% if item.Username %}<div class="credential-row"><span class="credential-label" data-i18n="username">Username</span><bdi class="mono" dir="ltr">{{ item.Username }}</bdi><button type="button" class="icon-button small-copy" data-copy-text="{{ item.Username }}"><i class="fa-solid fa-copy" aria-hidden="true"></i></button></div>{% endif %}
+                    {% if item.Password %}<div class="credential-row"><span class="credential-label" data-i18n="password">Password</span><bdi class="mono" dir="ltr">{{ item.Password }}</bdi><button type="button" class="icon-button small-copy" data-copy-text="{{ item.Password }}"><i class="fa-solid fa-copy" aria-hidden="true"></i></button></div>{% endif %}
+                    {% if item.IPSecPSK %}<div class="credential-row"><span class="credential-label" data-i18n="psk">IPSec PSK</span><bdi class="mono" dir="ltr">{{ item.IPSecPSK }}</bdi><button type="button" class="icon-button small-copy" data-copy-text="{{ item.IPSecPSK }}"><i class="fa-solid fa-copy" aria-hidden="true"></i></button></div>{% endif %}
+                  </div>
+                </li>
+                {% endfor %}
+              </ul>
+            </div>
+            {% endif %}
+                        {% if pptp %}
+            <div class="vpn-group">
+              <h3 class="vpn-group-title" data-i18n="pptpTitle">PPTP</h3>
+              <ul class="vpn-list">
+                {% for item in pptp %}
+                <li class="vpn-item credential">
+                  <div class="vpn-item-info"><strong class="vpn-item-name">{% if item.HostName %}{{ item.HostName }}{% else %}{{ item.Server }}{% endif %}</strong></div>
+                  <div class="credential-grid">
+                    <div class="credential-row"><span class="credential-label" data-i18n="server">Server</span><bdi class="mono" dir="ltr">{{ item.Server }}</bdi><button type="button" class="icon-button small-copy" data-copy-text="{{ item.Server }}"><i class="fa-solid fa-copy" aria-hidden="true"></i></button></div>
+                    {% if item.Username %}<div class="credential-row"><span class="credential-label" data-i18n="username">Username</span><bdi class="mono" dir="ltr">{{ item.Username }}</bdi><button type="button" class="icon-button small-copy" data-copy-text="{{ item.Username }}"><i class="fa-solid fa-copy" aria-hidden="true"></i></button></div>{% endif %}
+                    {% if item.Password %}<div class="credential-row"><span class="credential-label" data-i18n="password">Password</span><bdi class="mono" dir="ltr">{{ item.Password }}</bdi><button type="button" class="icon-button small-copy" data-copy-text="{{ item.Password }}"><i class="fa-solid fa-copy" aria-hidden="true"></i></button></div>{% endif %}
+                  </div>
+                </li>
+                {% endfor %}
+              </ul>
+            </div>
+            {% endif %}
+                        {% if ikev2 %}
+            <div class="vpn-group">
+              <h3 class="vpn-group-title" data-i18n="ikev2Title">IKEv2</h3>
+              <ul class="vpn-list">
+                {% for item in ikev2 %}
+                <li class="vpn-item credential">
+                  <div class="vpn-item-info"><strong class="vpn-item-name">{% if item.HostName %}{{ item.HostName }}{% else %}{{ item.Server }}{% endif %}</strong></div>
+                  <div class="credential-grid">
+                    <div class="credential-row"><span class="credential-label" data-i18n="server">Server</span><bdi class="mono" dir="ltr">{{ item.Server }}:{{ item.Port }}</bdi><button type="button" class="icon-button small-copy" data-copy-text="{{ item.Server }}"><i class="fa-solid fa-copy" aria-hidden="true"></i></button></div>
+                    {% if item.Username %}<div class="credential-row"><span class="credential-label" data-i18n="username">Username</span><bdi class="mono" dir="ltr">{{ item.Username }}</bdi><button type="button" class="icon-button small-copy" data-copy-text="{{ item.Username }}"><i class="fa-solid fa-copy" aria-hidden="true"></i></button></div>{% endif %}
+                    {% if item.Password %}<div class="credential-row"><span class="credential-label" data-i18n="password">Password</span><bdi class="mono" dir="ltr">{{ item.Password }}</bdi><button type="button" class="icon-button small-copy" data-copy-text="{{ item.Password }}"><i class="fa-solid fa-copy" aria-hidden="true"></i></button></div>{% endif %}
+                  </div>
+                </li>
+                {% endfor %}
+              </ul>
+            </div>
+            {% endif %}
+                        {% if anyconnect %}
+            <div class="vpn-group">
+              <h3 class="vpn-group-title" data-i18n="anyconnectTitle">Cisco AnyConnect</h3>
+              <ul class="vpn-list">
+                {% for item in anyconnect %}
+                <li class="vpn-item credential">
+                  <div class="vpn-item-info"><strong class="vpn-item-name">{% if item.HostName %}{{ item.HostName }}{% else %}{{ item.Server }}{% endif %}</strong></div>
+                  <div class="credential-grid">
+                    <div class="credential-row"><span class="credential-label" data-i18n="server">Server</span><bdi class="mono" dir="ltr">{{ item.Server }}:{{ item.Port }}</bdi><button type="button" class="icon-button small-copy" data-copy-text="{{ item.Server }}"><i class="fa-solid fa-copy" aria-hidden="true"></i></button></div>
+                    {% if item.Username %}<div class="credential-row"><span class="credential-label" data-i18n="username">Username</span><bdi class="mono" dir="ltr">{{ item.Username }}</bdi><button type="button" class="icon-button small-copy" data-copy-text="{{ item.Username }}"><i class="fa-solid fa-copy" aria-hidden="true"></i></button></div>{% endif %}
+                    {% if item.Password %}<div class="credential-row"><span class="credential-label" data-i18n="password">Password</span><bdi class="mono" dir="ltr">{{ item.Password }}</bdi><button type="button" class="icon-button small-copy" data-copy-text="{{ item.Password }}"><i class="fa-solid fa-copy" aria-hidden="true"></i></button></div>{% endif %}
+                  </div>
+                </li>
+                {% endfor %}
+              </ul>
+            </div>
+            {% endif %}
+          </div>
+        </section>
         <section class="glass card" aria-labelledby="help-title">
           <h2 id="help-title" data-i18n="helpTitle">Make yourself at home.</h2>
           <ol class="help-steps"><li data-i18n="step1">Install a compatible app for your device.</li><li data-i18n="step2">Import your subscription, then update its servers.</li><li data-i18n="step3">Choose a server in the app and connect.</li></ol>
@@ -360,7 +505,7 @@
         </section>
       </div>
     </main>
-    <footer><span><b dir="ltr">liquildGlassy</b> <span data-i18n="footer">· A softer side of TX-UI</span></span><span data-i18n="footerNote">Made to flow. Designed to feel light.</span></footer>
+    <footer><span><b dir="ltr">liquildGlassy</b> <span data-i18n="footer">· Rebecca Subscription</span></span><a href="https://t.me/im_https" target="_blank" rel="noopener noreferrer" style="opacity:.55;font-size:.62rem">@im_https</a><span data-i18n="footerNote">Made to flow. Designed to feel light.</span></footer>
   </div>
   <dialog id="qr-dialog" aria-labelledby="qr-title" aria-describedby="qr-hint">
     <div class="dialog-heading"><h2 id="qr-title" data-i18n="qrTitle">Scan. Import. Connect.</h2><button class="icon-button" type="button" data-close data-i18n-aria="close" aria-label="Close"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></div>
@@ -378,7 +523,6 @@
     <p class="caption" style="margin-top:15px" data-i18n="desktopAlternative">For a one-time import, use “Copy all” under Configurations, then import URLs from the clipboard in v2rayN (Ctrl+V on Windows).</p>
   </dialog>
   <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
-  <!-- QR_VENDOR_START: qrcode-generator 1.4.4, MIT, Kazuhiko Arase. Embedded to avoid network dependencies. -->
   <script id="qr-vendor">
 /*
 MIT License
@@ -2701,7 +2845,6 @@ var qrcode = function() {
 }));
 
 </script>
-  <!-- QR_VENDOR_END -->
   <script id="liquild-core">
     const LiquidGlassy = (() => {
       function number(raw) {
@@ -2726,13 +2869,13 @@ var qrcode = function() {
         const used = upload === null || download === null ? null : upload + download;
         const remaining = total === null || used === null || total === 0 ? null : Math.max(0, total - used);
         const percent = total > 0 && used !== null ? Math.min(100, used / total * 100) : null;
-        // Unlimited accounts show the actual upload/download split, never fabricated quota/history.
         const denominator = used === null || total === null ? 0 : total > 0 ? Math.max(total, used) : used;
         return { total, upload, download, used, remaining, percent,
           downloadAngle: denominator > 0 ? download / denominator * 360 : 0,
           usedAngle: denominator > 0 ? used / denominator * 360 : 0 };
       }
-      function status(model, expiration, now = Date.now()) {
+      function status(model, expiration, panelStatus, now = Date.now()) {
+        if (['active', 'on_hold', 'disabled', 'limited', 'expired'].includes(panelStatus)) return panelStatus;
         if (expiration.date && expiration.date.getTime() <= now) return 'expired';
         if (model.total > 0 && model.used !== null && model.used >= model.total) return 'exhausted';
         if (expiration.kind === 'pending') return 'pending';
@@ -2755,7 +2898,7 @@ var qrcode = function() {
         if (app === 'v2rayng') return 'v2rayng://install-sub?url=' + encodeURIComponent(url) + '#' + encodeURIComponent(name);
         if (app === 'v2box') return 'v2box://install-sub?url=' + encodeURIComponent(url) + '&name=' + encodeURIComponent(name);
         if (app === 'streisand') return 'streisand://import/' + url;
-        return ''; // v2rayN uses its supported clipboard/subscription-group workflow.
+        return '';
       }
       function configs(values) { return [...new Set(values.map(value => value.trim()).filter(value => /^(vless|vmess|trojan|ss|ssr|hysteria2?|hy2|tuic|wireguard|socks5?):\/\//i.test(value)))]; }
       function configName(value, fallback) {
@@ -2771,7 +2914,18 @@ var qrcode = function() {
         } catch (_) { /* A malformed display name must not break import/copy. */ }
         return fallback;
       }
-      return { number, bytes, httpUrl, expiry, usage, status, formatBytes, calendar, appLink, configs, configName };
+      function protocolOf(value) {
+        const match = String(value).trim().match(/^([a-z0-9+.-]+):/i);
+        if (!match) return '';
+        const scheme = match[1].toLowerCase();
+        if (scheme === 'hysteria2') return 'Hysteria2';
+        if (scheme === 'hy2') return 'Hysteria2';
+        return { vmess: 'VMess', vless: 'VLESS', trojan: 'Trojan', ss: 'Shadowsocks', ssr: 'ShadowsocksR', hysteria: 'Hysteria', tuic: 'TUIC', wireguard: 'WireGuard', socks: 'SOCKS', socks5: 'SOCKS5', http: 'HTTP', https: 'HTTPS' }[scheme] || scheme.toUpperCase();
+      }
+      function resetLabel(strategy, t) {
+        return ({ day: t('resetDaily'), week: t('resetWeekly'), month: t('resetMonthly'), year: t('resetYearly') })[strategy] || '';
+      }
+      return { number, bytes, httpUrl, expiry, usage, status, formatBytes, calendar, appLink, configs, configName, protocolOf, resetLabel };
     })();
   </script>
   <script id="liquild-app">
@@ -2780,10 +2934,16 @@ var qrcode = function() {
       const $ = id => document.getElementById(id);
       const raw = $('subscription-data').dataset;
       const model = LiquidGlassy.usage(raw), expiration = LiquidGlassy.expiry(raw.expire);
-      const subUrl = LiquidGlassy.httpUrl(raw.url), jsonUrl = LiquidGlassy.httpUrl(raw.json);
-      const configValues = LiquidGlassy.configs(Array.from($('source-configs').children, node => node.textContent));
-      const emails = Array.from($('source-emails').children, node => node.textContent.trim()).filter(Boolean);
+      const subUrl = LiquidGlassy.httpUrl(raw.url);
+      const panelStatus = String(raw.status || '').trim();
+      const resetStrategy = String(raw.resetStrategy || '').trim();
+      const configValues = LiquidGlassy.configs((() => {
+        let list = [];
+        try { list = Array.isArray(subscriptionLinks) ? subscriptionLinks : JSON.parse(subscriptionLinks); } catch (_) { list = []; }
+        return list.filter(item => typeof item === 'string');
+      })());
       const accountId = raw.id && !raw.id.includes('{') && raw.id !== '<no value>' ? raw.id : '';
+      const emails = accountId ? [accountId] : [];
       let language = document.documentElement.lang, toastTimer, modalTrigger;
       const strings = {
         en: {
@@ -2794,9 +2954,13 @@ var qrcode = function() {
           yourSubscription: 'Your subscription', subscriptionId: 'Subscription ID', dataAllowance: 'Data allowance', timeRemaining: 'Time remaining', gregorian: 'Gregorian', jalali: 'Jalali', expiryHint: 'Expiry dates · your device’s time zone', copySubscription: 'Copy subscription', qrCode: 'QR code',
           appsTitle: 'One tap. You’re on your way.', appsSubtitle: 'Bring your subscription to your favorite app.', android: 'Android', iosAndroid: 'iOS · Android', ios: 'iOS', desktop: 'Windows · macOS · Linux', importApp: 'Import to app', importClipboard: 'Import via clipboard', getApp: 'Get the app', getIos: 'iOS', getAndroid: 'Android', appNote: 'Install the app first. If it doesn’t open, copy your subscription and add it inside the app.',
           configsSubtitle: 'A direct route, when you need it.', noConfigs: 'No individual configurations are available.', copyAll: 'Copy all', downloadConfigs: 'Download .txt', subscriptionLink: 'Subscription link', copy: 'Copy', copyJson: 'Copy JSON subscription', helpTitle: 'Make yourself at home.',
-          step1: 'Install a compatible app for your device.', step2: 'Import your subscription, then update its servers.', step3: 'Choose a server in the app and connect.', privacyTitle: 'Your link is your key.', privacyNote: 'Keep your subscription and QR code private. QR codes are generated on your device; no external QR service is used.', footer: '· A softer side of TX-UI', footerNote: 'Made to flow. Designed to feel light.',
+          step1: 'Install a compatible app for your device.', step2: 'Import your subscription, then update its servers.', step3: 'Choose a server in the app and connect.', privacyTitle: 'Your link is your key.', privacyNote: 'Keep your subscription and QR code private. QR codes are generated on your device; no external QR service is used.', footer: '· Rebecca Subscription', footerNote: 'Made to flow. Designed to feel light.',
           qrTitle: 'Scan. Import. Connect.', qrHint: 'Scan with your client app. Keep this code private.', qrError: 'This link is too long for a QR code. Copy it instead.', qrValue: 'QR code content', close: 'Close', saveQr: 'Save QR', importTitle: 'Import into v2rayN', desktopHint: 'Copy the subscription below, then follow these steps in v2rayN.',
           desktopStep1: 'Open Subscription groups → Subscription group settings.', desktopStep2: 'Add a group, paste the URL, and save.', desktopStep3: 'Update the subscription, then choose a server.', desktopAlternative: 'For a one-time import, use “Copy all” under Configurations, then import URLs from the clipboard in v2rayN (Ctrl+V on Windows).',
+          resetDaily: 'resets daily', resetWeekly: 'resets weekly', resetMonthly: 'resets monthly', resetYearly: 'resets yearly',
+          onHold: 'On hold', disabled: 'Disabled', limited: 'Quota reached', disabledWarning: 'This subscription has been disabled. Contact your provider for details.', onHoldWarning: 'Your subscription starts on first connection.',
+          vpnTitle: 'VPN protocols', vpnSubtitle: 'Downloads and connection details for classic VPN protocols.', openvpnTitle: 'OpenVPN downloads', wireguardTitle: 'WireGuard', l2tpTitle: 'L2TP / IPSec', pptpTitle: 'PPTP', ikev2Title: 'IKEv2', anyconnectTitle: 'Cisco AnyConnect',
+          download: 'Download', copyLink: 'Copy link', copyConfig: 'Copy config', server: 'Server', username: 'Username', password: 'Password', psk: 'IPSec PSK',
           lightMode: 'Switch to light mode', darkMode: 'Switch to dark mode', unlimited: 'Unlimited', noExpiry: 'No expiry', pending: 'On first use', available: 'Within limits', expired: 'Expired', exhausted: 'Quota reached', unknown: 'Unavailable', days: '{n} days', ofQuota: 'used of {total}', unlimitedQuota: 'used · unlimited allowance', quotaUnknown: 'used · allowance unavailable', freeData: '{amount} still to explore', unlimitedMessage: 'No data cap. Keep exploring.', unknownMessage: 'Usage data is unavailable.',
           chartLabel: 'Downloaded: {download}. Uploaded: {upload}. Remaining: {remaining}.', expiredWarning: 'This subscription has expired. Contact your provider to renew it.', exhaustedWarning: 'You’ve used your data allowance. Contact your provider to top up.', soonWarning: 'Your subscription expires in {days} days. Plan your renewal with your provider.', lowWarning: 'Less than 10% of your data allowance remains.', missingData: 'Some subscription details are unavailable. Refresh this page or contact your provider.', missingUrl: 'The subscription link is unavailable. Contact your provider.',
           copied: 'Copied to clipboard', copyFailed: 'Could not copy automatically. Select and copy the link manually.', opening: 'Opening {app}… Confirm the import in the app. If it stays closed, use Copy subscription.', downloadedFile: 'Download prepared', config: 'Configuration {n}', copyConfig: 'Copy {name}', qrConfig: 'QR code for {name}', qrSubscription: 'Subscription QR code', defaultAccount: 'Your subscription'
@@ -2809,9 +2973,13 @@ var qrcode = function() {
           yourSubscription: 'اشتراک شما', subscriptionId: 'شناسه اشتراک', dataAllowance: 'حجم کل', timeRemaining: 'زمان باقی‌مانده', gregorian: 'میلادی', jalali: 'شمسی', expiryHint: 'تاریخ انقضا · منطقه زمانی دستگاه شما', copySubscription: 'کپی لینک اشتراک', qrCode: 'کد QR',
           appsTitle: 'یک لمس تا شروع اتصال.', appsSubtitle: 'اشتراک را به برنامه دلخواه خود اضافه کنید.', android: 'اندروید', iosAndroid: 'آی‌اواس · اندروید', ios: 'آی‌اواس', desktop: 'ویندوز · مک · لینوکس', importApp: 'ورود به برنامه', importClipboard: 'ورود با کلیپ‌بورد', getApp: 'دریافت برنامه', getIos: 'آی‌اواس', getAndroid: 'اندروید', appNote: 'ابتدا برنامه را نصب کنید. اگر باز نشد، لینک اشتراک را کپی و داخل برنامه اضافه کنید.',
           configsSubtitle: 'وقتی به یک مسیر مستقیم نیاز دارید.', noConfigs: 'کانفیگ جداگانه‌ای در دسترس نیست.', copyAll: 'کپی همه', downloadConfigs: 'دانلود فایل txt', subscriptionLink: 'لینک اشتراک', copy: 'کپی', copyJson: 'کپی اشتراک JSON', helpTitle: 'به‌سادگی شروع کنید.',
-          step1: 'برنامه سازگار با دستگاه خود را نصب کنید.', step2: 'اشتراک را وارد و سرورهای آن را به‌روزرسانی کنید.', step3: 'در برنامه یک سرور انتخاب کنید و متصل شوید.', privacyTitle: 'لینک شما، کلید شماست.', privacyNote: 'لینک اشتراک و کد QR را خصوصی نگه دارید. کدها روی دستگاه شما ساخته می‌شوند و به سرویس دیگری ارسال نمی‌شوند.', footer: '· چهره‌ای لطیف‌تر از TX-UI', footerNote: 'روان در استفاده، سبک در طراحی.',
+          step1: 'برنامه سازگار با دستگاه خود را نصب کنید.', step2: 'اشتراک را وارد و سرورهای آن را به‌روزرسانی کنید.', step3: 'در برنامه یک سرور انتخاب کنید و متصل شوید.', privacyTitle: 'لینک شما، کلید شماست.', privacyNote: 'لینک اشتراک و کد QR را خصوصی نگه دارید. کدها روی دستگاه شما ساخته می‌شوند و به سرویس دیگری ارسال نمی‌شوند.', footer: '· اشتراک ربکا', footerNote: 'روان در استفاده، سبک در طراحی.',
           qrTitle: 'اسکن، افزودن، اتصال.', qrHint: 'با برنامه خود اسکن کنید. این کد را خصوصی نگه دارید.', qrError: 'این لینک برای ساخت کد QR بیش از حد طولانی است. آن را کپی کنید.', qrValue: 'محتوای کد QR', close: 'بستن', saveQr: 'ذخیره QR', importTitle: 'افزودن به v2rayN', desktopHint: 'لینک زیر را کپی کنید، سپس این مراحل را در v2rayN انجام دهید.',
           desktopStep1: 'بخش Subscription groups و سپس Subscription group settings را باز کنید.', desktopStep2: 'یک گروه بسازید، لینک را جای‌گذاری و ذخیره کنید.', desktopStep3: 'اشتراک را به‌روزرسانی و یک سرور انتخاب کنید.', desktopAlternative: 'برای ورود یک‌باره، از بخش کانفیگ‌ها «کپی همه» را بزنید و در v2rayN لینک‌ها را از کلیپ‌بورد وارد کنید (در ویندوز Ctrl+V).',
+          resetDaily: 'بازنشانی روزانه', resetWeekly: 'بازنشانی هفتگی', resetMonthly: 'بازنشانی ماهانه', resetYearly: 'بازنشانی سالانه',
+          onHold: 'در انتظار شروع', disabled: 'غیرفعال', limited: 'حجم به پایان رسیده', disabledWarning: 'اشتراک شما غیرفعال شده است. برای اطلاعات بیشتر با ارائه‌دهنده تماس بگیرید.', onHoldWarning: 'اشتراک شما با اولین اتصال شروع می‌شود.',
+          vpnTitle: 'پروتکل‌های VPN', vpnSubtitle: 'فایل‌های دانلود و اطلاعات اتصال پروتکل‌های کلاسیک VPN.', openvpnTitle: 'دانلود OpenVPN', wireguardTitle: 'WireGuard', l2tpTitle: 'L2TP / IPSec', pptpTitle: 'PPTP', ikev2Title: 'IKEv2', anyconnectTitle: 'Cisco AnyConnect',
+          download: 'دانلود', copyLink: 'کپی لینک', copyConfig: 'کپی کانفیگ', server: 'سرور', username: 'نام کاربری', password: 'رمز عبور', psk: 'کلید IPSec',
           lightMode: 'تغییر به حالت روشن', darkMode: 'تغییر به حالت تاریک', unlimited: 'نامحدود', noExpiry: 'بدون انقضا', pending: 'پس از اولین استفاده', available: 'در محدوده مجاز', expired: 'منقضی‌شده', exhausted: 'حجم تمام شده', unknown: 'نامشخص', days: '{n} روز', ofQuota: 'مصرف از {total}', unlimitedQuota: 'مصرف · حجم نامحدود', quotaUnknown: 'مصرف · حجم کل نامشخص', freeData: '{amount} برای ادامه مسیر', unlimitedMessage: 'بدون محدودیت حجم؛ به کشف ادامه دهید.', unknownMessage: 'اطلاعات مصرف در دسترس نیست.',
           chartLabel: 'دانلود: {download}. آپلود: {upload}. باقی‌مانده: {remaining}.', expiredWarning: 'اشتراک شما منقضی شده است. برای تمدید با ارائه‌دهنده تماس بگیرید.', exhaustedWarning: 'حجم اشتراک شما تمام شده است. برای افزایش حجم با ارائه‌دهنده تماس بگیرید.', soonWarning: 'اشتراک شما تا {days} روز دیگر منقضی می‌شود. برای تمدید با ارائه‌دهنده هماهنگ کنید.', lowWarning: 'کمتر از ۱۰ درصد حجم اشتراک باقی مانده است.', missingData: 'بخشی از اطلاعات اشتراک در دسترس نیست. صفحه را تازه‌سازی کنید یا با ارائه‌دهنده تماس بگیرید.', missingUrl: 'لینک اشتراک در دسترس نیست. با ارائه‌دهنده تماس بگیرید.',
           copied: 'در کلیپ‌بورد کپی شد', copyFailed: 'کپی خودکار انجام نشد. لینک را انتخاب و به‌صورت دستی کپی کنید.', opening: 'در حال باز کردن {app}… ورود را در برنامه تأیید کنید. اگر باز نشد، لینک اشتراک را کپی کنید.', downloadedFile: 'فایل برای دانلود آماده شد', config: 'کانفیگ {n}', copyConfig: 'کپی {name}', qrConfig: 'کد QR برای {name}', qrSubscription: 'کد QR اشتراک', defaultAccount: 'اشتراک شما'
@@ -2868,11 +3036,13 @@ var qrcode = function() {
         }
         const days = expiration.date ? Math.max(0, Math.ceil((expiration.date - now) / 86400000)) : null;
         text('days-value', days === null ? t(expiration.kind === 'unlimited' ? 'noExpiry' : expiration.kind) : t('days', { n: num(days) }));
-        const state = LiquidGlassy.status(model, expiration, now.getTime());
+        const state = LiquidGlassy.status(model, expiration, panelStatus, now.getTime());
         text('account-status', t(state)); $('account-status').dataset.kind = state;
         let warning = '';
         if (state === 'expired') warning = t('expiredWarning');
-        else if (state === 'exhausted') warning = t('exhaustedWarning');
+        else if (state === 'exhausted' || state === 'limited') warning = t('exhaustedWarning');
+        else if (state === 'disabled') warning = t('disabledWarning');
+        else if (state === 'on_hold') warning = t('onHoldWarning');
         else if (days !== null && days <= 3) warning = t('soonWarning', { days: num(days) });
         else if (model.percent >= 90) warning = t('lowWarning');
         text('account-warning', warning); $('account-warning').hidden = !warning;
@@ -2885,7 +3055,8 @@ var qrcode = function() {
           const row = document.createElement('li'); row.className = 'config-row';
           const info = document.createElement('div'); info.className = 'config-info';
           const title = document.createElement('strong'); title.textContent = name; title.dir = 'auto';
-          const protocol = document.createElement('small'); protocol.textContent = value.split(':')[0].toUpperCase(); protocol.dir = 'ltr'; info.append(title, protocol);
+          const badge = document.createElement('span'); badge.className = 'protocol-badge'; badge.textContent = LiquidGlassy.protocolOf(value); badge.dir = 'ltr';
+          const protocol = document.createElement('small'); protocol.className = 'protocol-line'; protocol.append(badge); protocol.dir = 'ltr'; info.append(title, protocol);
           const copyButton = document.createElement('button'); copyButton.className = 'icon-button'; copyButton.type = 'button'; copyButton.append(createIcon('copy')); copyButton.setAttribute('aria-label', t('copyConfig', { name })); copyButton.title = t('copy'); copyButton.addEventListener('click', () => copy(value));
           const qrButton = document.createElement('button'); qrButton.className = 'icon-button'; qrButton.type = 'button'; qrButton.append(createIcon('qrcode')); qrButton.setAttribute('aria-label', t('qrConfig', { name })); qrButton.title = t('qrCode'); qrButton.addEventListener('click', () => showQr(value));
           row.append(info, copyButton, qrButton); $('config-list').append(row);
@@ -2904,7 +3075,9 @@ var qrcode = function() {
         text('used-total', fmt(model.used)); text('download-value', fmt(model.download)); text('upload-value', fmt(model.upload));
         const remaining = model.total === 0 ? t('unlimited') : fmt(model.remaining);
         text('remaining-value', remaining); text('allowance-value', model.total === 0 ? t('unlimited') : fmt(model.total));
-        text('quota-caption', model.total === 0 ? t('unlimitedQuota') : model.total === null ? t('quotaUnknown') : t('ofQuota', { total: fmt(model.total) }));
+        const quotaBase = model.total === 0 ? t('unlimitedQuota') : model.total === null ? t('quotaUnknown') : t('ofQuota', { total: fmt(model.total) });
+        const resetSuffix = LiquidGlassy.resetLabel(resetStrategy, t);
+        text('quota-caption', resetSuffix ? quotaBase + ' \u00b7 ' + resetSuffix : quotaBase);
         text('usage-percent', model.percent === null ? model.total === 0 && model.used !== null ? '∞' : '—' : new Intl.NumberFormat(language === 'fa' ? 'fa-IR' : 'en-US', { style: 'percent', maximumFractionDigits: 0 }).format(model.percent / 100));
         text('chart-caption', t(model.total === 0 ? 'trafficSplit' : 'dataUsed'));
         $('usage-chart').style.setProperty('--download-angle', model.downloadAngle + 'deg'); $('usage-chart').style.setProperty('--used-angle', model.usedAngle + 'deg');
@@ -2915,7 +3088,7 @@ var qrcode = function() {
         $('subscription-link').value = subUrl; $('subscription-link').placeholder = t('missingUrl');
         ['copy-sub', 'show-qr', 'copy-link'].forEach(id => { $(id).disabled = !subUrl; });
         document.querySelectorAll('[data-app]').forEach(button => { button.disabled = !subUrl; button.setAttribute('aria-label', t(button.dataset.app === 'v2rayn' ? 'importClipboard' : 'importApp') + ': ' + ({ v2rayng: 'v2rayNG', v2box: 'V2Box', streisand: 'Streisand', v2rayn: 'v2rayN' })[button.dataset.app]); });
-        $('copy-json').hidden = !jsonUrl; $('qr-canvas').setAttribute('aria-label', t('qrValue'));
+        $('copy-json').hidden = true; $('qr-canvas').setAttribute('aria-label', t('qrValue'));
       }
       function openDialog(dialog) { modalTrigger = document.activeElement; dialog.showModal(); }
       function saveBlob(blob, name) {
@@ -2924,7 +3097,6 @@ var qrcode = function() {
       function showQr(value) {
         $('qr-value').value = value; $('qr-error').hidden = true; $('qr-wrap').hidden = false; $('save-qr').disabled = false;
         try {
-          // UTF-8 encoding and a four-module quiet zone keep Unicode config names and scanners compatible.
           qrcode.stringToBytes = input => Array.from(new TextEncoder().encode(input));
           const code = qrcode(0, 'M'); code.addData(value, 'Byte'); code.make();
           const count = code.getModuleCount(), scale = Math.max(3, Math.floor(780 / (count + 8))), size = (count + 8) * scale;
@@ -2942,7 +3114,7 @@ var qrcode = function() {
         if (!['light', 'dark'].includes(saved)) { document.documentElement.dataset.theme = event.matches ? 'dark' : 'light'; renderTheme(); }
       });
       ['copy-sub', 'copy-link', 'copy-import'].forEach(id => $(id).addEventListener('click', () => copy(subUrl)));
-      $('copy-json').addEventListener('click', () => copy(jsonUrl)); $('copy-configs').addEventListener('click', () => copy(configValues.join('\n')));
+      $('copy-configs').addEventListener('click', () => copy(configValues.join('\n')));
       $('show-qr').addEventListener('click', () => showQr(subUrl)); $('copy-qr').addEventListener('click', () => copy($('qr-value').value));
       $('save-qr').addEventListener('click', () => $('qr-canvas').toBlob(blob => { if (blob) saveBlob(blob, 'liquildGlassy-qr.png'); }, 'image/png'));
       $('download-configs').addEventListener('click', () => { saveBlob(new Blob([configValues.join('\n') + '\n'], { type: 'text/plain;charset=utf-8' }), 'liquildGlassy-configs.txt'); toast(t('downloadedFile')); });
@@ -2957,274 +3129,19 @@ var qrcode = function() {
         dialog.addEventListener('click', event => { if (event.target === dialog) { const rect = dialog.getBoundingClientRect(); if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) dialog.close(); } });
         dialog.addEventListener('close', () => { modalTrigger?.focus({ preventScroll: true }); });
       });
+      document.querySelectorAll('[data-copy-text]').forEach(button => {
+        if (button.dataset.bound) return;
+        button.dataset.bound = '1';
+        button.addEventListener('click', () => copy(button.dataset.copyText));
+      });
+      const vpnSection = $('vpn-protocols');
+      if (vpnSection) vpnSection.hidden = vpnSection.querySelectorAll('.vpn-group').length === 0;
       render(); setInterval(renderDates, 60000);
     })();
   </script>
 </body>
-<!-- ASSET_LICENSES_START
-Vazirmatn 33.003 — https://github.com/rastikerdar/vazirmatn
-Copyright 2015 The Vazirmatn Project Authors (https://github.com/rastikerdar/vazirmatn)
-
-This Font Software is licensed under the SIL Open Font License, Version 1.1.
-This license is copied below, and is also available with a FAQ at:
-http://scripts.sil.org/OFL
-
-
-—————————————————————————————-
-SIL OPEN FONT LICENSE Version 1.1 - 26 February 2007
-—————————————————————————————-
-
-PREAMBLE
-The goals of the Open Font License (OFL) are to stimulate worldwide
-development of collaborative font projects, to support the font creation
-efforts of academic and linguistic communities, and to provide a free and
-open framework in which fonts may be shared and improved in partnership
-with others.
-
-The OFL allows the licensed fonts to be used, studied, modified and
-redistributed freely as long as they are not sold by themselves. The
-fonts, including any derivative works, can be bundled, embedded, 
-redistributed and/or sold with any software provided that any reserved
-names are not used by derivative works. The fonts and derivatives,
-however, cannot be released under any other type of license. The
-requirement for fonts to remain under this license does not apply
-to any document created using the fonts or their derivatives.
-
-DEFINITIONS
-"Font Software" refers to the set of files released by the Copyright
-Holder(s) under this license and clearly marked as such. This may
-include source files, build scripts and documentation.
-
-"Reserved Font Name" refers to any names specified as such after the
-copyright statement(s).
-
-"Original Version" refers to the collection of Font Software components as
-distributed by the Copyright Holder(s).
-
-"Modified Version" refers to any derivative made by adding to, deleting,
-or substituting — in part or in whole — any of the components of the
-Original Version, by changing formats or by porting the Font Software to a
-new environment.
-
-"Author" refers to any designer, engineer, programmer, technical
-writer or other person who contributed to the Font Software.
-
-PERMISSION & CONDITIONS
-Permission is hereby granted, free of charge, to any person obtaining
-a copy of the Font Software, to use, study, copy, merge, embed, modify,
-redistribute, and sell modified and unmodified copies of the Font
-Software, subject to the following conditions:
-
-1) Neither the Font Software nor any of its individual components,
-in Original or Modified Versions, may be sold by itself.
-
-2) Original or Modified Versions of the Font Software may be bundled,
-redistributed and/or sold with any software, provided that each copy
-contains the above copyright notice and this license. These can be
-included either as stand-alone text files, human-readable headers or
-in the appropriate machine-readable metadata fields within text or
-binary files as long as those fields can be easily viewed by the user.
-
-3) No Modified Version of the Font Software may use the Reserved Font
-Name(s) unless explicit written permission is granted by the corresponding
-Copyright Holder. This restriction only applies to the primary font name as
-presented to the users.
-
-4) The name(s) of the Copyright Holder(s) or the Author(s) of the Font
-Software shall not be used to promote, endorse or advertise any
-Modified Version, except to acknowledge the contribution(s) of the
-Copyright Holder(s) and the Author(s) or with their explicit written
-permission.
-
-5) The Font Software, modified or unmodified, in part or in whole,
-must be distributed entirely under this license, and must not be
-distributed under any other license. The requirement for fonts to
-remain under this license does not apply to any document created
-using the Font Software.
-
-TERMINATION
-This license becomes null and void if any of the above conditions are
-not met.
-
-DISCLAIMER
-THE FONT SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTIES OF
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT
-OF COPYRIGHT, PATENT, TRADEMARK, OR OTHER RIGHT. IN NO EVENT SHALL THE
-COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-INCLUDING ANY GENERAL, SPECIAL, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL
-DAMAGES, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM
-OTHER DEALINGS IN THE FONT SOFTWARE.
-
-Font Awesome Free 6.7.2 — https://fontawesome.com
-Fonticons, Inc. (https://fontawesome.com)
-
-————————————————————————————————————————
-
-Font Awesome Free License
-
-Font Awesome Free is free, open source, and GPL friendly. You can use it for
-commercial projects, open source projects, or really almost whatever you want.
-Full Font Awesome Free license: https://fontawesome.com/license/free.
-
-————————————————————————————————————————
-
-# Icons: CC BY 4.0 License (https://creativecommons.org/licenses/by/4.0/)
-
-The Font Awesome Free download is licensed under a Creative Commons
-Attribution 4.0 International License and applies to all icons packaged
-as SVG and JS file types.
-
-————————————————————————————————————————
-
-# Fonts: SIL OFL 1.1 License
-
-In the Font Awesome Free download, the SIL OFL license applies to all icons
-packaged as web and desktop font files.
-
-Copyright (c) 2024 Fonticons, Inc. (https://fontawesome.com)
-with Reserved Font Name: "Font Awesome".
-
-This Font Software is licensed under the SIL Open Font License, Version 1.1.
-This license is copied below, and is also available with a FAQ at:
-http://scripts.sil.org/OFL
-
-SIL OPEN FONT LICENSE
-Version 1.1 - 26 February 2007
-
-PREAMBLE
-The goals of the Open Font License (OFL) are to stimulate worldwide
-development of collaborative font projects, to support the font creation
-efforts of academic and linguistic communities, and to provide a free and
-open framework in which fonts may be shared and improved in partnership
-with others.
-
-The OFL allows the licensed fonts to be used, studied, modified and
-redistributed freely as long as they are not sold by themselves. The
-fonts, including any derivative works, can be bundled, embedded,
-redistributed and/or sold with any software provided that any reserved
-names are not used by derivative works. The fonts and derivatives,
-however, cannot be released under any other type of license. The
-requirement for fonts to remain under this license does not apply
-to any document created using the fonts or their derivatives.
-
-DEFINITIONS
-"Font Software" refers to the set of files released by the Copyright
-Holder(s) under this license and clearly marked as such. This may
-include source files, build scripts and documentation.
-
-"Reserved Font Name" refers to any names specified as such after the
-copyright statement(s).
-
-"Original Version" refers to the collection of Font Software components as
-distributed by the Copyright Holder(s).
-
-"Modified Version" refers to any derivative made by adding to, deleting,
-or substituting — in part or in whole — any of the components of the
-Original Version, by changing formats or by porting the Font Software to a
-new environment.
-
-"Author" refers to any designer, engineer, programmer, technical
-writer or other person who contributed to the Font Software.
-
-PERMISSION & CONDITIONS
-Permission is hereby granted, free of charge, to any person obtaining
-a copy of the Font Software, to use, study, copy, merge, embed, modify,
-redistribute, and sell modified and unmodified copies of the Font
-Software, subject to the following conditions:
-
-1) Neither the Font Software nor any of its individual components,
-in Original or Modified Versions, may be sold by itself.
-
-2) Original or Modified Versions of the Font Software may be bundled,
-redistributed and/or sold with any software, provided that each copy
-contains the above copyright notice and this license. These can be
-included either as stand-alone text files, human-readable headers or
-in the appropriate machine-readable metadata fields within text or
-binary files as long as those fields can be easily viewed by the user.
-
-3) No Modified Version of the Font Software may use the Reserved Font
-Name(s) unless explicit written permission is granted by the corresponding
-Copyright Holder. This restriction only applies to the primary font name as
-presented to the users.
-
-4) The name(s) of the Copyright Holder(s) or the Author(s) of the Font
-Software shall not be used to promote, endorse or advertise any
-Modified Version, except to acknowledge the contribution(s) of the
-Copyright Holder(s) and the Author(s) or with their explicit written
-permission.
-
-5) The Font Software, modified or unmodified, in part or in whole,
-must be distributed entirely under this license, and must not be
-distributed under any other license. The requirement for fonts to
-remain under this license does not apply to any document created
-using the Font Software.
-
-TERMINATION
-This license becomes null and void if any of the above conditions are
-not met.
-
-DISCLAIMER
-THE FONT SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTIES OF
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT
-OF COPYRIGHT, PATENT, TRADEMARK, OR OTHER RIGHT. IN NO EVENT SHALL THE
-COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-INCLUDING ANY GENERAL, SPECIAL, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL
-DAMAGES, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM
-OTHER DEALINGS IN THE FONT SOFTWARE.
-
-————————————————————————————————————————
-
-# Code: MIT License (https://opensource.org/licenses/MIT)
-
-In the Font Awesome Free download, the MIT license applies to all non-font and
-non-icon files.
-
-Copyright 2024 Fonticons, Inc.
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in the
-Software without restriction, including without limitation the rights to use, copy,
-modify, merge, publish, distribute, sublicense, and/or sell copies of the Software,
-and to permit persons to whom the Software is furnished to do so, subject to the
-following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
-INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
-PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-————————————————————————————————————————
-
-# Attribution
-
-Attribution is required by MIT, SIL OFL, and CC BY licenses. Downloaded Font
-Awesome Free files already contain embedded comments with sufficient
-attribution, so you shouldn't need to do anything additional when using these
-files normally.
-
-We've kept attribution comments terse, so we ask that you do not actively work
-to remove them from files, especially code. They're a great way for folks to
-learn about Font Awesome.
-
-————————————————————————————————————————
-
-# Brand Icons
-
-All brand icons are trademarks of their respective owners. The use of these
-trademarks does not indicate endorsement of the trademark holder by Font
-Awesome, nor vice versa. **Please do not use brand logos for any purpose except
-to represent the company, product, or service to which they refer.**
-
-Client icons: official 2dust/v2rayNG and 2dust/v2rayN repositories; V2Box and Streisand App Store artwork. Used solely to identify the respective applications. See tests/liquildGlassy/README.md for sources.
-ASSET_LICENSES_END -->
+<!--
+  Fork by https://t.me/im_https 😂
+-->
 
 </html>
