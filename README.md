@@ -1,6 +1,7 @@
 # LiquildGlassy for Rebecca
 
-Custom subscription page templates for **Rebecca Panel**, Forked by **[im_https](https://t.me/im_https)**.
+Custom subscription page templates for **Rebecca Panel**, Designed by **[Incognito-Coder](https://github.com/Incognito-Coder)**.
+Forked by **[im_https](https://t.me/im_https)**,
 
 ## Quick Install
 
