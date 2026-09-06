@@ -59,5 +59,6 @@ Your custom subscription page should now be displayed instead of the default pag
 
 # Credits
 
-Designed by **[Incognito-Coder](https://github.com/Incognito-Coder)**.
-Forked by **[im_https](https://t.me/im_https)**
+# Designed by **[Incognito-Coder](https://github.com/Incognito-Coder)**.
+
+# Forked by **[im_https](https://t.me/im_https)**
