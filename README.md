@@ -57,7 +57,7 @@ The subscription templates can be used with services supporting:
 1. Create your custom HTML template and name it:
 
 ```text
-sub.html
+index.html
 ```
 
 2. Copy it to:
@@ -68,7 +68,7 @@ sub.html
 
 3. Open the panel settings.
 
-4. Go to **Subscription** and enable **Custom Template**.
+4. Go to **Settings**, then **Subscriptions**, and in the **Custom templates directory**, type /var/lib/rebecca/templates.
 
 5. Save the settings and restart the panel service.
 
