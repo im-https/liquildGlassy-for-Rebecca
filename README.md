@@ -1,63 +1,93 @@
 # TX-ThemeHub
 
-TX-UI Panel Subscription Page Templates Designed By TX Community.
+Custom subscription page templates for **TX-UI / Rebecca Panel**, designed by the TX Community.
 
 ## Quick Install
 
-you can install pre-designed user themes as your sub custom ui using below command in terminal:
+Install a pre-designed subscription theme with one command:
+
 ```bash
-bash <(curl -Ls https://github.com/im-https/liquildGlassy-for-Rebecca/master/install.sh)
+bash <(curl -Ls https://raw.githubusercontent.com/im-https/liquildGlassy-for-Rebecca/main/install.sh)
 ```
 
-## Usable Variables
+## Supported Languages
 
-| Variable       | Description                                    |
-| -------------- | ---------------------------------------------- |
-| `result`       | Returns the URI for Vmess/Vless.               |
-| `emails`       | Returns array of client emails in sub.         |
-| `total`        | Returns the formatted total traffic.           |
-| `expire`       | End date as a timestamp.                       |
-| `upload`       | Returns the formatted uploaded traffic.        |
-| `download`     | Returns the formatted downloaded traffic.      |
-| `totalByte`    | Returns the total traffic in bytes.            |
-| `uploadByte`   | Returns the total uploaded traffic in bytes.   |
-| `downloadByte` | Returns the total downloaded traffic in bytes. |
-| `sId`          | Returns the subscription user ID.              |
-| `subUrl`       | Gets the full subscription URL.                |
-| `jsonUrl`      | Gets the current subscription json URL         |
+* 🇬🇧 English — Default
+* 🇮🇷 فارسی
 
-**example**
+## Supported Protocols
+
+The subscription templates can be used with services supporting:
+
+* VMess
+* VLESS
+* OpenVPN
+* WireGuard
+* L2TP/IPsec
+* PPTP
+* IKEv2
+* AnyConnect
+* SSH
+
+## Available Variables
+
+| Variable       | Description                       |
+| -------------- | --------------------------------- |
+| `result`       | Vmess/Vless subscription URI      |
+| `emails`       | Client emails in the subscription |
+| `total`        | Total traffic                     |
+| `expire`       | Expiration date as timestamp      |
+| `upload`       | Uploaded traffic                  |
+| `download`     | Downloaded traffic                |
+| `totalByte`    | Total traffic in bytes            |
+| `uploadByte`   | Uploaded traffic in bytes         |
+| `downloadByte` | Downloaded traffic in bytes       |
+| `sId`          | Subscription user ID              |
+| `subUrl`       | Full subscription URL             |
+| `jsonUrl`      | Subscription JSON URL             |
+
+### Example
+
 ```html
-<div>sub url is : {{ .subUrl }}</div>
+<div>Subscription URL: {{ .subUrl }}</div>
 ```
 
-## Steps to Implement
+## Installation
 
-1. Design an HTML page and name it **sub.html**.
-2. Move the file to the following directory:
-   ```
-   /etc/x-ui/html/
-   ```
-3. Go to the panel settings, navigate to the **Subscription** section, and enable the **Custom Template** option.
-4. Save the changes and restart the service.
+1. Create your custom HTML template and name it:
 
-If everything is done correctly, your custom template should now be displayed instead of the default subscription page.
+```text
+sub.html
+```
 
-<details>
-<summary>liquildGlassy · Green / English / light</summary>
+2. Copy it to:
+
+```text
+/etc/x-ui/html/
+```
+
+3. Open the panel settings.
+
+4. Go to **Subscription** and enable **Custom Template**.
+
+5. Save the settings and restart the panel service.
+
+Your custom subscription page should now be displayed instead of the default page.
+
+## Themes
+
+### liquildGlassy — Green / English / Light
 
 ![liquildGlassy green theme](./screenshots/liquildGlassy-green.png)
-</details>
 
-## ScreenShots
-
-<details>
-<summary>liquildGlassy · Pink / English / light</summary>
+### liquildGlassy — Pink / English / Light
 
 ![liquildGlassy English light theme](./screenshots/liquildGlassy.png)
-</details>
-<details>
-<summary>liquildGlassy · Green / فارسی / dark / mobile</summary>
+
+### liquildGlassy — Green / فارسی / Dark / Mobile
 
 ![liquildGlassy Persian dark mobile theme](./screenshots/liquildGlassy-fa-dark.png)
-</details>
+
+## Credits
+
+Designed by **TX Community**.
