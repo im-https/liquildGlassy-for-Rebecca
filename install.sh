@@ -34,7 +34,7 @@ clear
 print_header "LiquildGlassy Template Installer"
 echo ""
 echo -e "${BOLD}${CYAN}Custom subscription page template for Rebecca Panel${NC}"
-echo -e "${BOLD}${CYAN}Designed by TX Community${NC}"
+echo -e "${BOLD}${CYAN}Designed by https://github.com/Incognito-Coder${NC}"
 echo ""
 
 print_info "Checking root privileges..."
@@ -130,7 +130,7 @@ echo ""
 
 echo -e "${CYAN}────────────────────────────────────────────────────────────${NC}"
 echo -e "${BOLD}${BLUE}Forked by:${NC} ${BOLD}${CYAN}https://t.me/im_https${NC}"
-echo -e "${BOLD}${BLUE}Credits:${NC} ${BOLD}${CYAN}Incognito-Coder & TX Community${NC}"
+echo -e "${BOLD}${BLUE}Designed by:${NC} ${BOLD}${CYAN}https://github.com/Incognito-Coder${NC}"
 echo -e "${CYAN}────────────────────────────────────────────────────────────${NC}"
 echo ""
 
