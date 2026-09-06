@@ -29,29 +29,6 @@ The subscription templates can be used with services supporting:
 * AnyConnect
 * SSH
 
-## Available Variables
-
-| Variable       | Description                       |
-| -------------- | --------------------------------- |
-| `result`       | Vmess/Vless subscription URI      |
-| `emails`       | Client emails in the subscription |
-| `total`        | Total traffic                     |
-| `expire`       | Expiration date as timestamp      |
-| `upload`       | Uploaded traffic                  |
-| `download`     | Downloaded traffic                |
-| `totalByte`    | Total traffic in bytes            |
-| `uploadByte`   | Uploaded traffic in bytes         |
-| `downloadByte` | Downloaded traffic in bytes       |
-| `sId`          | Subscription user ID              |
-| `subUrl`       | Full subscription URL             |
-| `jsonUrl`      | Subscription JSON URL             |
-
-### Example
-
-```html
-<div>Subscription URL: {{ .subUrl }}</div>
-```
-
 ## Installation
 
 1. Create your custom HTML template and name it:
