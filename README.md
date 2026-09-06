@@ -1,4 +1,4 @@
-# TX-ThemeHub
+# LiquildGlassy for Rebecca
 
 Custom subscription page templates for **TX-UI / Rebecca Panel**, designed by the TX Community.
 
