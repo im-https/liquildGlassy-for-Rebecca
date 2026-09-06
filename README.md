@@ -63,7 +63,7 @@ sub.html
 2. Copy it to:
 
 ```text
-/etc/x-ui/html/
+/var/lib/rebecca/templates/subscription
 ```
 
 3. Open the panel settings.
