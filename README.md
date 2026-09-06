@@ -31,7 +31,7 @@ The subscription templates can be used with services supporting:
 
 ## Installation
 
-1. Create your custom HTML template and name it:
+1. Create your custom HTML template and name it , Then open (https://github.com/im-https/liquildGlassy-for-Rebecca/blob/main/themes/index.html)[this link] and copy the code:
 
 ```text
 index.html
