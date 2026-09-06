@@ -1,69 +1,84 @@
 #!/bin/bash
 
-# مسیر هدف برای کپی فایل قالب
+# Target directory for template file
 TARGET_DIR="/var/lib/rebecca/templates/subscription"
-# مسیر موقت برای کلون کردن مخزن
+# Temporary directory for cloning the repository
 TEMP_REPO_DIR="/tmp/liquildGlassy-for-Rebecca"
 
-# رنگ‌ها برای خروجی زیباتر
+# Colors for better output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 NC='\033[0m' # No Color
 
-echo -e "${GREEN}شروع نصب قالب LiquildGlassy برای Rebecca Panel...${NC}"
+echo -e "${GREEN}Starting LiquildGlassy template installation for Rebecca Panel...${NC}"
 
-# 1. بررسی اجرا با دسترسی روت (برای نوشتن در /var/lib)
+# 1. Check for root privileges (required for writing to /var/lib)
 if [[ $EUID -ne 0 ]]; then
-   echo -e "${RED}این اسکریپت باید با دسترسی روت (sudo) اجرا شود.${NC}"
+   echo -e "${RED}This script must be run with root privileges (sudo).${NC}"
    exit 1
 fi
 
-# 2. ایجاد پوشه هدف در صورت وجود نداشتن
+# 2. Create target directory if it doesn't exist
 mkdir -p "$TARGET_DIR"
 
-# 3. حذف پوشه موقت قدیمی (در صورت وجود)
+# 3. Remove old temporary directory (if it exists)
 rm -rf "$TEMP_REPO_DIR"
 
-# 4. کلون کردن مخزن
-echo -e "${GREEN}در حال دریافت آخرین نسخه قالب از مخزن...${NC}"
+# 4. Clone the repository
+echo -e "${GREEN}Fetching the latest template version from repository...${NC}"
 git clone https://github.com/im-https/liquildGlassy-for-Rebecca.git "$TEMP_REPO_DIR"
 
-# 5. بررسی موفقیت کلون
+# 5. Check if clone was successful
 if [ $? -ne 0 ]; then
-    echo -e "${RED}خطا در کلون کردن مخزن. لطفاً اتصال اینترنت خود را بررسی کنید.${NC}"
+    echo -e "${RED}Failed to clone repository. Please check your internet connection.${NC}"
     exit 1
 fi
 
-# 6. پیدا کردن و کپی کردن فایل index.html
-#    بر اساس ساختار، فایل‌های قالب در پوشه themes قرار دارند.
-#    ما یک فایل index.html را از اولین پوشه موجود در themes برمی‌داریم.
-#    برای سادگی، می‌توانید دقیقاً مشخص کنید از کدام قالب استفاده شود.
-#    مثال: از قالب 'liquildGlassy' استفاده می‌کنیم.
-THEME_SOURCE="$TEMP_REPO_DIR/themes/liquildGlassy/index.html"
+# 6. Find and copy the index.html file
+#    Based on repository structure, HTML files are directly in the themes folder
+#    We'll look for any .html file and copy the first one found
+#    or you can specify a specific one like "liquildGlassy.html"
+THEME_FILE="liquildGlassy.html"  # Default theme file
+THEME_SOURCE="$TEMP_REPO_DIR/themes/$THEME_FILE"
 
+# If default file doesn't exist, try to find any .html file in themes folder
+if [ ! -f "$THEME_SOURCE" ]; then
+    echo -e "${GREEN}Default theme file not found, looking for any HTML file in themes folder...${NC}"
+    # Find first .html file in themes directory
+    FOUND_FILE=$(find "$TEMP_REPO_DIR/themes" -maxdepth 1 -name "*.html" | head -n 1)
+    if [ -n "$FOUND_FILE" ]; then
+        THEME_SOURCE="$FOUND_FILE"
+        echo -e "${GREEN}Found template file: $THEME_SOURCE${NC}"
+    else
+        echo -e "${RED}No HTML template files found in the themes directory.${NC}"
+        echo -e "${RED}Please check the repository structure.${NC}"
+        rm -rf "$TEMP_REPO_DIR"
+        exit 1
+    fi
+fi
+
+# 7. Copy the template file to target directory as index.html
 if [ -f "$THEME_SOURCE" ]; then
-    echo -e "${GREEN}یافتن فایل قالب در: $THEME_SOURCE${NC}"
-    cp "$THEME_SOURCE" "$TARGET_DIR/"
-    echo -e "${GREEN}فایل index.html با موفقیت در $TARGET_DIR کپی شد.${NC}"
+    echo -e "${GREEN}Copying template from: $THEME_SOURCE${NC}"
+    cp "$THEME_SOURCE" "$TARGET_DIR/index.html"
+    echo -e "${GREEN}Successfully copied template to $TARGET_DIR/index.html${NC}"
 else
-    echo -e "${RED}خطا: فایل index.html در مسیر $THEME_SOURCE یافت نشد.${NC}"
-    echo -e "${RED}لطفاً ساختار پوشه‌های پروژه را بررسی کنید.${NC}"
-    # پاکسازی و خروج
+    echo -e "${RED}Error: Template file not found at $THEME_SOURCE${NC}"
     rm -rf "$TEMP_REPO_DIR"
     exit 1
 fi
 
-# 7. پاکسازی: حذف پوشه موقت
+# 8. Cleanup: Remove temporary directory
 rm -rf "$TEMP_REPO_DIR"
-echo -e "${GREEN}پاکسازی انجام شد.${NC}"
+echo -e "${GREEN}Cleanup completed.${NC}"
 
-# 8. راهنمای نهایی
-echo -e "${GREEN}✅ نصب با موفقیت انجام شد!${NC}"
-echo "مراحل بعدی:"
-echo "1. در پنل Rebecca، به بخش Settings -> Subscriptions بروید."
-echo "2. در قسمت 'Custom templates directory'، مسیر زیر را وارد کنید:"
+# 9. Final instructions
+echo -e "${GREEN}Installation completed successfully!${NC}"
+echo "Next steps:"
+echo "1. In Rebecca Panel, go to Settings -> Subscriptions."
+echo "2. In the 'Custom templates directory' field, enter the following path:"
 echo "   /var/lib/rebecca/templates"
-echo "3. تنظیمات را ذخیره کرده و سرویس پنل را مجدداً راه‌اندازی کنید."
-echo "قالب شما در آدرس اشتراک‌گیری قابل مشاهده خواهد بود."
+echo "3. Save the settings and restart the panel service."
+echo "Your custom subscription page should now be displayed."
 
 exit 0
