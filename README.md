@@ -50,7 +50,10 @@ If everything is done correctly, your custom template should now be displayed in
 </details>
 
 ## ScreenShots
+
 <details>
+<summary>liquildGlassy · Pink / English / light</summary>
+
 ![liquildGlassy English light theme](./screenshots/liquildGlassy.png)
 </details>
 <details>
