@@ -1,6 +1,6 @@
 # LiquildGlassy for Rebecca
 
-Custom subscription page templates for **TX-UI / Rebecca Panel**, designed by the TX Community.
+Custom subscription page templates for **Rebecca Panel**, Forked by **[im_https](https://t.me/im_https)**.
 
 ## Quick Install
 
