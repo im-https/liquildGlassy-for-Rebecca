@@ -90,4 +90,4 @@ Your custom subscription page should now be displayed instead of the default pag
 
 ## Credits
 
-Designed by **TX Community**.
+Designed by **[Incognito-Coder](https://github.com/Incognito-Coder)**.
