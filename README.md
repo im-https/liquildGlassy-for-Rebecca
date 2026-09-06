@@ -10,11 +10,6 @@ Install a pre-designed subscription theme with one command:
 bash <(curl -Ls https://raw.githubusercontent.com/im-https/liquildGlassy-for-Rebecca/main/install.sh)
 ```
 
-## Supported Languages
-
-* 🇬🇧 English — Default
-* 🇮🇷 فارسی
-
 ## Supported Protocols
 
 The subscription templates can be used with services supporting:
