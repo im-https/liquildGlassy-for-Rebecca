@@ -73,32 +73,23 @@ if [ $? -ne 0 ]; then
 fi
 print_success "Repository cloned successfully"
 
-print_info "Looking for template files..."
-THEME_FILE="liquildGlassy.html"
-THEME_SOURCE="$TEMP_REPO_DIR/themes/$THEME_FILE"
+print_info "Looking for index.html file..."
+INDEX_SOURCE="$TEMP_REPO_DIR/index.html"
 
-if [ ! -f "$THEME_SOURCE" ]; then
-    print_info "Default theme not found, searching for available themes..."
-    FOUND_FILE=$(find "$TEMP_REPO_DIR/themes" -maxdepth 1 -name "*.html" | head -n 1)
-    if [ -n "$FOUND_FILE" ]; then
-        THEME_SOURCE="$FOUND_FILE"
-        THEME_NAME=$(basename "$FOUND_FILE" .html)
-        print_success "Found template: $THEME_NAME"
-    else
-        print_error "No HTML template files found in the themes directory."
-        rm -rf "$TEMP_REPO_DIR"
-        exit 1
-    fi
+if [ -f "$INDEX_SOURCE" ]; then
+    print_success "Found index.html in repository root"
 else
-    print_success "Found default template: liquildGlassy"
+    print_error "index.html not found in repository root."
+    rm -rf "$TEMP_REPO_DIR"
+    exit 1
 fi
 
 print_info "Installing template..."
-if [ -f "$THEME_SOURCE" ]; then
-    cp "$THEME_SOURCE" "$TARGET_DIR/index.html"
+if [ -f "$INDEX_SOURCE" ]; then
+    cp "$INDEX_SOURCE" "$TARGET_DIR/index.html"
     print_success "Template installed successfully"
 else
-    print_error "Template file not found at $THEME_SOURCE"
+    print_error "Template file not found at $INDEX_SOURCE"
     rm -rf "$TEMP_REPO_DIR"
     exit 1
 fi
