@@ -53,10 +53,6 @@ Your custom subscription page should now be displayed instead of the default pag
 
 ![liquildGlassy English light theme](./screenshots/liquildGlassy.png)
 
-### liquildGlassy — Green / فارسی / Dark / Mobile
-
-![liquildGlassy Persian dark mobile theme](./screenshots/liquildGlassy-fa-dark.png)
-
 # Credits
 
 # Designed by *[Incognito-Coder](https://github.com/Incognito-Coder)*
